@@ -7,7 +7,7 @@
 //
 // Claude Sonnet 4.6 is used for code generation and refactoring.
 
-package frc.robot.utils.simulation;
+package frc.robot.Utils.simulation;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -92,10 +92,8 @@ public class RobotBumpSim {
     private static final Translation3d GRAVITY = new Translation3d(0, 0, -9.81);
 
     /** Full length of the REBUILT field (metres). */
-    private static final double FIELD_LENGTH = 16.51;
+    private static final double FIELD_LENGTH = 16.54;
 
-    /** Full width of the REBUILT field (metres). */
-    private static final double FIELD_WIDTH = 8.04;
 
     /**
      * Start points of the eight bump XZ line segments (four per alliance, ascending + descending).
@@ -107,19 +105,30 @@ public class RobotBumpSim {
      * <p>Indices 0–3 are the Blue-side bump (near X ≈ 3.96–5.18 m); indices 4–7 are the Red-side
      * bump (near X ≈ FIELD_LENGTH−5.18 – FIELD_LENGTH−3.96 m).
      */
+    // Hub Y center and dimensions (from RebuiltHub.java)
+    private static final double HUB_Y = 4.035;
+    private static final double RAMP_HALF_Y = 2.756;  // 217" / 2 in metres
+    private static final double HUB_HALF_Y  = 0.597;  // 47" / 2 in metres
+
+    // Y range boundaries for bump segments
+    private static final double Y_MIN       = HUB_Y - RAMP_HALF_Y; // 1.279
+    private static final double Y_HUB_LOWER = HUB_Y - HUB_HALF_Y;  // 3.438
+    private static final double Y_HUB_UPPER = HUB_Y + HUB_HALF_Y;  // 4.632
+    private static final double Y_MAX       = HUB_Y + RAMP_HALF_Y; // 6.791
+
     static final Translation3d[] BUMP_LINE_STARTS = {
         // Blue bump — ascending faces (Z rises from 0 → 0.165 m)
-        new Translation3d(3.96,                    1.57,                    0),
-        new Translation3d(3.96,                    FIELD_WIDTH / 2 + 0.60,  0),
+        new Translation3d(3.96,                    Y_MIN,        0),
+        new Translation3d(3.96,                    Y_HUB_UPPER,  0),
         // Blue bump — descending faces (Z falls from 0.165 → 0 m)
-        new Translation3d(4.61,                    1.57,                    0.165),
-        new Translation3d(4.61,                    FIELD_WIDTH / 2 + 0.60,  0.165),
+        new Translation3d(4.61,                    Y_MIN,        0.165),
+        new Translation3d(4.61,                    Y_HUB_UPPER,  0.165),
         // Red bump — ascending faces
-        new Translation3d(FIELD_LENGTH - 5.18,     1.57,                    0),
-        new Translation3d(FIELD_LENGTH - 5.18,     FIELD_WIDTH / 2 + 0.60,  0),
+        new Translation3d(FIELD_LENGTH - 5.18,     Y_MIN,        0),
+        new Translation3d(FIELD_LENGTH - 5.18,     Y_HUB_UPPER,  0),
         // Red bump — descending faces
-        new Translation3d(FIELD_LENGTH - 4.61,     1.57,                    0.165),
-        new Translation3d(FIELD_LENGTH - 4.61,     FIELD_WIDTH / 2 + 0.60,  0.165),
+        new Translation3d(FIELD_LENGTH - 4.61,     Y_MIN,        0.165),
+        new Translation3d(FIELD_LENGTH - 4.61,     Y_HUB_UPPER,  0.165),
     };
 
     /**
@@ -130,17 +139,17 @@ public class RobotBumpSim {
      */
     static final Translation3d[] BUMP_LINE_ENDS = {
         // Blue bump — ascending faces
-        new Translation3d(4.61,                    FIELD_WIDTH / 2 - 0.60,  0.165),
-        new Translation3d(4.61,                    FIELD_WIDTH - 1.57,      0.165),
+        new Translation3d(4.61,                    Y_HUB_LOWER,  0.165),
+        new Translation3d(4.61,                    Y_MAX,        0.165),
         // Blue bump — descending faces
-        new Translation3d(5.18,                    FIELD_WIDTH / 2 - 0.60,  0),
-        new Translation3d(5.18,                    FIELD_WIDTH - 1.57,      0),
+        new Translation3d(5.18,                    Y_HUB_LOWER,  0),
+        new Translation3d(5.18,                    Y_MAX,        0),
         // Red bump — ascending faces
-        new Translation3d(FIELD_LENGTH - 4.61,     FIELD_WIDTH / 2 - 0.60,  0.165),
-        new Translation3d(FIELD_LENGTH - 4.61,     FIELD_WIDTH - 1.57,      0.165),
+        new Translation3d(FIELD_LENGTH - 4.61,     Y_HUB_LOWER,  0.165),
+        new Translation3d(FIELD_LENGTH - 4.61,     Y_MAX,        0.165),
         // Red bump — descending faces
-        new Translation3d(FIELD_LENGTH - 3.96,     FIELD_WIDTH / 2 - 0.60,  0),
-        new Translation3d(FIELD_LENGTH - 3.96,     FIELD_WIDTH - 1.57,      0),
+        new Translation3d(FIELD_LENGTH - 3.96,     Y_HUB_LOWER,  0),
+        new Translation3d(FIELD_LENGTH - 3.96,     Y_MAX,        0),
     };
 
     /** Index of the first bump segment in {@link #BUMP_LINE_STARTS} (inclusive). */

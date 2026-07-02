@@ -12,20 +12,32 @@ import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.Utils.LimelightHelpers;
+import frc.robot.Utils.ShotPredictor.Shot;
+import frc.robot.Utils.simulation.FixedArena2026Rebuilt;
+import frc.robot.Utils.simulation.FuelBumpSim;
+
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
-import org.ironmaple.simulation.seasonspecific.rebuilt2026.Arena2026Rebuilt;
 import org.ironmaple.simulation.seasonspecific.rebuilt2026.RebuiltFuelOnField;
 
 public class Robot extends TimedRobot {
-    private Command m_autonomousCommand;
-
+    
+    // Set Variables
+    public static boolean shooterEnabled = false;
+    public static final boolean test = false; //?
+    public static final boolean defense = false;//?
     private final RobotContainer m_robotContainer;
+    private Command autonomousCommand;
+    public static Shot shot;
+
+   
 
     private final boolean kUseLimelight = false;
+    private final FuelBumpSim fuelBumpSim = new FuelBumpSim();
 
     public Robot() {
-        SimulatedArena.overrideInstance(new Arena2026Rebuilt(false));
+        SimulatedArena.overrideInstance(new FixedArena2026Rebuilt(false));
         m_robotContainer = new RobotContainer();
     }
 
@@ -73,10 +85,13 @@ public class Robot extends TimedRobot {
 
     @Override
     public void autonomousInit() {
-        m_autonomousCommand = m_robotContainer.getAutonomousCommand();
+        
+autonomousCommand = m_robotContainer.getAutonomousCommand();
 
-        if (m_autonomousCommand != null) {
-            m_autonomousCommand.schedule();
+        if (
+    autonomousCommand != null) {
+            
+    autonomousCommand.schedule();
         }
     }
 
@@ -88,8 +103,10 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopInit() {
-        if (m_autonomousCommand != null) {
-            m_autonomousCommand.cancel();
+        if (
+    autonomousCommand != null) {
+            
+    autonomousCommand.cancel();
         }
     }
 
@@ -112,6 +129,6 @@ public class Robot extends TimedRobot {
 
     @Override
     public void simulationPeriodic() {
-        DogLog.log("Simulation/FuelPoses", SimulatedArena.getInstance().getGamePiecesArrayByType("Fuel"));
+        DogLog.log("Simulation/FuelPoses", fuelBumpSim.update(5));
     }
 }
