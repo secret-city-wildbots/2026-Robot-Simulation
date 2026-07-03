@@ -14,9 +14,18 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
+import com.ctre.phoenix6.Utils;
 import frc.robot.Actors.Subsystems.CommandSwerveDrivetrain;
+import frc.robot.Actors.Subsystems.Intake.Intake;
+import frc.robot.Actors.Subsystems.Intake.IntakeIOReal;
+import frc.robot.Actors.Subsystems.Intake.IntakeIOSim;
+import frc.robot.Actors.Subsystems.Shooter.Shooter;
+import frc.robot.Actors.Subsystems.Shooter.ShooterIOReal;
+import frc.robot.Actors.Subsystems.Shooter.ShooterIOSim;
+import frc.robot.Actors.Subsystems.Shooter.Turret;
 import frc.robot.generated.TunerConstants;
 
 public class RobotContainer {
@@ -39,11 +48,24 @@ public class RobotContainer {
     private final CommandXboxController joystick = new CommandXboxController(0);
 
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
+    public final Intake intake;
+    public final Shooter shooter;
+    public final Turret turret = new Turret();
 
     /* Path follower */
     private final SendableChooser<Command> autoChooser;
 
     public RobotContainer() {
+        // Create intake and shooter with real or sim IO
+        if (Utils.isSimulation()) {
+            intake = new Intake(new IntakeIOSim(drivetrain.getDriveSimulation()));
+            shooter = new Shooter(new ShooterIOSim(
+                    drivetrain.getDriveSimulation(), turret::getTurretAngle));
+        } else {
+            intake = new Intake(new IntakeIOReal());
+            shooter = new Shooter(new ShooterIOReal());
+        }
+
         autoChooser = AutoBuilder.buildAutoChooser("Tests");
         SmartDashboard.putData("Auto Mode", autoChooser);
 
@@ -86,6 +108,21 @@ public class RobotContainer {
 
         // reset the field-centric heading on left bumper press
         joystick.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+
+        // right bumper: run intake while held
+        joystick.rightBumper().whileTrue(intake.runEnd(() -> intake.intake(), () -> intake.stop()));
+
+        // left trigger: spin up flywheels while held
+        joystick.leftTrigger().whileTrue(shooter.runEnd(
+                () -> { shooter.setRPS(60); shooter.setHoodAngle(25); },
+                () -> shooter.stop()));
+
+        // right trigger: shoot (doesn't require shooter subsystem so it won't interrupt flywheel spinup)
+        joystick.rightTrigger().onTrue(Commands.runOnce(() -> {
+            if (intake.obtainFuel()) {
+                shooter.launchFuel();
+            }
+        }));
 
         drivetrain.registerTelemetry(logger::telemeterize);
     }

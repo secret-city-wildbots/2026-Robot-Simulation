@@ -50,7 +50,7 @@ public class ClearTransferCommand extends Command {
         //?
         transfer.setRPS(-30.0);
         indexer.setRPS(0.0, -30.0);
-        intake.motor.vel(-20.0);
+        intake.setVelocity(-20.0);
         shooter.setRPS(-10);
         shooter.setHoodAngle(20.0);
         timer.reset();

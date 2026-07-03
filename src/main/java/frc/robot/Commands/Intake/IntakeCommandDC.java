@@ -27,7 +27,7 @@ public class IntakeCommandDC extends Command {
     @Override
     public void initialize() {
         // Call the intake subsystem set function
-        intake.motor.vel(motorSpeedPercentage);
+        intake.setVelocity(motorSpeedPercentage);
     }
 
     @Override

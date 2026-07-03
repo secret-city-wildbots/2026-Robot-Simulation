@@ -27,6 +27,13 @@ public final class Constants {
     public static final int loopTime_ms = 20;
   }
 
+  public static class SimulationConstants {
+    // Intake + Hopper (values in METERS — Meters.of() is used in IntakeIOSim)
+    public static final int hopperSize = 50;
+    public static final double intakeWidth = Units.inchesToMeters(26.25);  // ~0.667m
+    public static final double intakeExtBeyondBumper = Units.inchesToMeters(8.0);  // ~0.203m
+  }
+
   public static class VisionConstants {
     // Limelight Names
     public static final String[] limelightNames = {"limelight-front", "limelight-back", "limelight-left", "limelight-right"};

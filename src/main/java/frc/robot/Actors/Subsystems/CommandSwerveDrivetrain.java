@@ -28,6 +28,7 @@ import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Utils.simulation.MapleSimSwerveDrivetrain;
 import frc.robot.Utils.simulation.RobotBumpSim;
+import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import frc.robot.generated.TunerConstants;
 import frc.robot.generated.TunerConstants.TunerSwerveDrivetrain;
 
@@ -303,6 +304,11 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         /* Run simulation at a faster rate so PID gains behave more reasonably */
         m_simNotifier = new Notifier(mapleSimSwerveDrivetrain::update);
         m_simNotifier.startPeriodic(kSimLoopPeriod);
+    }
+
+    /** Returns the maple-sim drive simulation, or null if not in simulation. */
+    public SwerveDriveSimulation getDriveSimulation() {
+        return mapleSimSwerveDrivetrain != null ? mapleSimSwerveDrivetrain.mapleSimDrive : null;
     }
 
     @Override
